@@ -1,0 +1,17 @@
+antlr4-python3-runtime==4.7.2
+certifi==2020.4.5.1
+chardet==3.0.4
+decorator==4.4.2
+idna==2.9
+immutables==0.6
+msgpack==0.6.2
+networkx==2.4
+numpy==1.18.4
+pyquil==2.19.0
+python-rapidjson==0.9.1
+pyzmq==19.0.1
+requests==2.23.0
+rpcq==3.3.0
+ruamel.yaml==0.16.10
+ruamel.yaml.clib==0.2.0
+urllib3==1.25.9
