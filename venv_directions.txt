@@ -1,0 +1,10 @@
+To create a virtual environment with the correct dependencies:
+
+(inside of the directory 2020239)
+python3 -m virtualenv venv // creates virtual environment
+source venv/bin/activate // enters virtual environment
+pip install -r requirements.txt // installs dependencies from requirements.txt
+
+
+deactivate // to exit the virtual environment
+
