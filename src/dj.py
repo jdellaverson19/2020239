@@ -20,16 +20,20 @@ def quantum_DJ(f):
 	-------
 	1 if f is constant
 	0 if f is balanced
-
 	"""
 	n = len(inspect.signature(f).parameters)
 
 	# construct U_f
 
+
 	# prepare initial states
 	qubits = list(range(n+1))
 
 	p = Program()
+
+	# apply not to last qubit
+	p += NOT(n)
+
 	# apply hadamard to all qubits
 	for i in range(n+1):
 		p += H(i)
@@ -41,7 +45,7 @@ def quantum_DJ(f):
 	for i in range(n):
 		p += H(i)
 
-	# prepare classical register
+	# prepare classical register for first n qubits
 	ro = p.declare('ro', 'BIT', n)
 
 	# measure first n qubits
@@ -49,6 +53,11 @@ def quantum_DJ(f):
 		p += MEASURE(i, ro[i])
 
 	# get appropriate quantum computer
+	qvm = get_qc(f'{n}q-qvm')
+
 	# run program
-		# if all 0 --> output 0
-		# if nonzero --> output 1
+	# when on actual quantum computer - run many times
+	results = np.array(qvm.run(p))
+
+	# return 0 if all zero else 1
+	return 1 if (1 in results) else 0
