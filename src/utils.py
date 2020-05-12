@@ -1,5 +1,5 @@
 from operator import xor
-
+import numpy as np
 
 
 def dot_product(st1, st2):
@@ -37,4 +37,3 @@ def xor(st1, st2):
 def mSB(x):
     return np.argwhere(np.asarray(x) == 1)[0][0]
 
-    
