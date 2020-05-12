@@ -13,7 +13,7 @@ def main():
 	
 
 	# constants
-	N = 2
+	N = 3
 	times = 1
 
 
@@ -22,7 +22,7 @@ def main():
 
 	print('Testing out Simons alorithm...')
 
-	for n in range(1,N):
+	for n in range(0,1):
 		print(f'Trying 2*{N}-qubit machine...')
 		for j in range(times):
 			print(f'Iteration {j+1}...')
@@ -56,6 +56,7 @@ def main():
 				print("FAILURE")
 			else:
 				print("SUCCESS")
+			print(end-start, "time in seconds")
 	qubit_values = []
 	for i in range(N):
 		qubit_values += [2*i]
@@ -63,7 +64,7 @@ def main():
 	average_runtimes = []
 	for i in range(N):
 		average_runtimes += [np.mean(timing[i])]
-
+	timing[0] = 0
 	plt.plot(qubit_values, average_runtimes)
 	plt.ylabel('Runtime (s)')
 	plt.xlabel('Number of Qubits')

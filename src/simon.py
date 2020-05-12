@@ -9,7 +9,7 @@ from collections import defaultdict
 from typing import Dict, Tuple
 import numpy.random as rd
 from pyquil.quil import DefGate
-
+from operator import xor
 
 
 
@@ -102,7 +102,6 @@ class Simon(object):
 	def run(self, qc, bitmap):
 		self.n_compQubs = len(list(bitmap.keys())[0])
 		self.findIndependentVectors(bitmap, qc)
-		print("found indep vectors")
 		self.findMaskFromEq(bitmap)
 
 	def findIndependentVectors(self, bitmap, qc):
@@ -116,25 +115,18 @@ class Simon(object):
 			compiledCirq = qc.compile(simCircuit)
 			sampled_bit_string = np.array(qc.run(compiledCirq)[0], dtype=int)
 			self.checkIfSafeAddition(sampled_bit_string)
-			print("Iteration of find indep over")
-			print(sampled_bit_string)
 	
 	def checkIfSafeAddition(self, x):
 		#Check if all 0's
 		if (x == 0).all():
-			print("it was all 0s")
 			return None
 		xMsb = utils.mSB(x)
-		print("msb", x, xMsb)
 		if (xMsb not in self.linIndepVectDict.keys()):
 			self.linIndepVectDict[xMsb] = x
-			print("About to add:")
-			print(x)
+
 
 	def findMaskFromEq(self, bitmap):
-		print("Finding mask now")
-		print(self.linIndepVectDict.keys())
-		print(self.linIndepVectDict.values())
+
 		#We got n-1 linearly independent equations, so now we need to add a last one to get n
 		lasteq = self.lasteq()
 		upper_triangular_matrix = np.asarray(
@@ -144,7 +136,6 @@ class Simon(object):
 
 		msb_unit_vec = np.zeros(shape=(self.n_compQubs,), dtype=int)
 		msb_unit_vec[lasteq] = 1
-		print(upper_triangular_matrix, msb_unit_vec)
 		self.mask = self.backSub(upper_triangular_matrix, msb_unit_vec).tolist()
 
 	def lasteq(self):
@@ -159,7 +150,6 @@ class Simon(object):
 		augment_vec = np.zeros(shape=(self.n_compQubs,))
 		augment_vec[missing_msb] = 1
 		self.linIndepVectDict[missing_msb] = augment_vec.astype(int).tolist()
-		print("miss", missing_msb, self.linIndepVectDict)
 		return missing_msb
 
 	def getMask(self):
@@ -176,8 +166,7 @@ class Simon(object):
 			row = firstMat[row_num]
 			for col_num in range(row_num + 1, n):
 				if row[col_num] == 1:
-					print("Are we in backsub?")
-					m[row_num] = utils.xor(secondMat[row_num], secondMat[col_num])
+					m[row_num] = xor(secondMat[row_num], secondMat[col_num])
 
 		return m[::-1]
 
