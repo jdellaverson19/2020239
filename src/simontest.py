@@ -22,7 +22,6 @@ def main():
 
 	print('Testing out Simons alorithm...')
 
-	seed(943856)
 	for n in range(0,N):
 		print(f'Trying 2*{N}-qubit machine...')
 		for j in range(times):
@@ -32,8 +31,12 @@ def main():
 			s = ""
 			for i in range(0, N):
 				s+=str(randint(0,1))
-			bitmap = simon.create_simons_bitmap(s)
-			
+			print("s is: ", s)
+
+			s = "11"
+
+			bitmap = simon.create_simons_bitmap(s, 42)
+			print("got past declaring bitmap")
 			strLen = N*2
 			qcStr = str(strLen) + "q-qvm"
 			qc = get_qc(qcStr)
@@ -43,7 +46,7 @@ def main():
 			start = time.perf_counter()
 			result = simonObject.run(qc,bitmap)
 			end = time.perf_counter()
-
+			print("over")
 			# print('worked' if result == constant else 'failed')
 			timing[n][j] = (end - start)
 

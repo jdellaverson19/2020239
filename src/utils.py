@@ -17,7 +17,6 @@ def dot_product(st1, st2):
 
 
 def xor(st1, st2):
-
     if len(st1) != len(st2):
         print("str lens not equal")
         exit()
