@@ -11,6 +11,7 @@ import sys
 def main(a , b ):
 	#We must construct an oracle for the QC to do its magic. We do so by creating a mapping from 
 	#all possible inputs to outputs
+
 	bitmap = bv.create_bv_bitmap(a,b)
 
 	#We use pyquil to instantiate an appropriately sized QVM
