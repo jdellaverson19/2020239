@@ -13,7 +13,7 @@ def main():
 	
 
 	# constants
-	N = 3
+	N = 1
 	times = 1
 
 
