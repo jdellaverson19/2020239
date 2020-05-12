@@ -40,7 +40,6 @@ def create_valid_2to1_bitmap(mask: str, random_seed: int = None) -> Dict[str, st
 		val = range_of_2to1_map[cnt]
 		bit_map_dct[bitstring_tup[0]] = val
 		bit_map_dct[bitstring_tup[1]] = val
-	print (bit_map_dct)
 	return bit_map_dct
 
 
@@ -78,7 +77,6 @@ class Simon(object):
 				# of the oracle unitary
 				i, j = int(pad_str+k, 2), int(utils.xor(pad_str, v) + k, 2)
 				ufunc[i, j] = 1
-		print(ufunc)
 		return ufunc, index_mapping_dct
 
 
@@ -112,14 +110,10 @@ class Simon(object):
 			
 			simCircuit = Program()
 			simCircuitReadout = simCircuit.declare('ro', 'BIT', self.n_compQubs)
-			print("Simcircuit declared")
 			simCircuit += self.makeTheCircuit(bitmap)
-			print("Circuit made")
 			for i in range(self.n_compQubs):
 				simCircuit+=MEASURE(i, simCircuitReadout[i])
-			print(simCircuit)
 			compiledCirq = qc.compile(simCircuit)
-			print("Circuit compiled")
 			sampled_bit_string = np.array(qc.run(compiledCirq)[0], dtype=int)
 			self.checkIfSafeAddition(sampled_bit_string)
 			print("Iteration of find indep over")
@@ -131,14 +125,42 @@ class Simon(object):
 			print("it was all 0s")
 			return None
 		xMsb = utils.mSB(x)
+		print("msb", x, xMsb)
 		if (xMsb not in self.linIndepVectDict.keys()):
 			self.linIndepVectDict[xMsb] = x
 			print("About to add:")
 			print(x)
 
 	def findMaskFromEq(self, bitmap):
-		print("shouldn't be here")
+		print("Finding mask now")
+		print(self.linIndepVectDict.keys())
+		print(self.linIndepVectDict.values())
+		#We got n-1 linearly independent equations, so now we need to add a last one to get n
+		lasteq = self.lasteq()
+		upper_triangular_matrix = np.asarray(
+			[tup[1] for tup in sorted(zip(self.linIndepVectDict.keys(),
+										  self.linIndepVectDict.values()),
+									  key=lambda x: x[0])])
 
+		msb_unit_vec = np.zeros(shape=(self.n_compQubs,), dtype=int)
+		msb_unit_vec[lasteq] = 1
+		print(upper_triangular_matrix, msb_unit_vec)
+		self.mask = self.backSub(upper_triangular_matrix, msb_unit_vec).tolist()
+
+	def lasteq(self):
+		missing_msb = None
+		for idx in range(self.n_compQubs):
+			if idx not in self.linIndepVectDict.keys():
+				missing_msb = idx
+
+		if missing_msb is None:
+			raise ValueError("Expected a missing provenance, but didn't find one.")
+
+		augment_vec = np.zeros(shape=(self.n_compQubs,))
+		augment_vec[missing_msb] = 1
+		self.linIndepVectDict[missing_msb] = augment_vec.astype(int).tolist()
+		print("miss", missing_msb, self.linIndepVectDict)
+		return missing_msb
 
 	def getMask(self):
 		return self.mask
@@ -155,7 +177,7 @@ class Simon(object):
 			for col_num in range(row_num + 1, n):
 				if row[col_num] == 1:
 					print("Are we in backsub?")
-					m[row_num] = xor(secondMat[row_num], secondMat[col_num])
+					m[row_num] = utils.xor(secondMat[row_num], secondMat[col_num])
 
 		return m[::-1]
 

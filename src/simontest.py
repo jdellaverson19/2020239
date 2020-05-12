@@ -14,7 +14,7 @@ def main():
 
 	# constants
 	N = 2
-	times = 3
+	times = 1
 
 
 	worked = np.zeros(shape=(N, times))
@@ -22,7 +22,7 @@ def main():
 
 	print('Testing out Simons alorithm...')
 
-	for n in range(0,N):
+	for n in range(1,N):
 		print(f'Trying 2*{N}-qubit machine...')
 		for j in range(times):
 			print(f'Iteration {j+1}...')
@@ -33,10 +33,8 @@ def main():
 				s+=str(randint(0,1))
 			print("s is: ", s)
 
-			s = "11"
 
 			bitmap = simon.create_simons_bitmap(s, 42)
-			print("got past declaring bitmap")
 			strLen = N*2
 			qcStr = str(strLen) + "q-qvm"
 			qc = get_qc(qcStr)
@@ -50,9 +48,14 @@ def main():
 			# print('worked' if result == constant else 'failed')
 			timing[n][j] = (end - start)
 
-			print("The calculated mask: " + simonObject.getMask())
-			if(s!=simonObject.getMask()):
+			print("The calculated mask: ", simonObject.getMask())
+			calcS = ""
+			for i in simonObject.getMask():
+				calcS+=str(i)
+			if(s!=calcS):
 				print("FAILURE")
+			else:
+				print("SUCCESS")
 	qubit_values = []
 	for i in range(N):
 		qubit_values += [2*i]
