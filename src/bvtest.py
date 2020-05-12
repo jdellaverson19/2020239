@@ -1,60 +1,64 @@
-from pyquil import Program, get_qc
-from pyquil.gates import *
-import bv as bv
+from bv import BernsteinVazirani
+
 import time
 import sys
+from random import seed
 from random import randint
-from math import floor
+from random import randrange
+import numpy as np
+import matplotlib.pyplot as plt
 
-#This main testing method invokes the bv class to solve the Berstein Vazirani problem. 
-#it takes in two strings, a and b, which are the bitstring inputs to the problem. 
-#f(x) = x dot a + b (wher b is addition mod 2 and the dot is the dot product)
-def main(N):
+def main():
+	
+	bvObject = BernsteinVazirani()
 
-	#First, we generate a random a and b:
-	b = str(randint(0,1))
-	a = ""
-	for i in range(int(N)):
-		a+=str(randint(0,1))
-	#We must construct an oracle for the QC to do its magic. We do so by creating a mapping from 
-	#all possible inputs to outputs
+	# constants
+	QUBIT_RANGE = 5
+	ITERATIONS = 2
 
-	bitmap = bv.create_bv_bitmap(a,b)
 
-	#We use pyquil to instantiate an appropriately sized QVM
-	strLen = len(a) + 1
-	qcStr = str(strLen) + "q-qvm"
-	qc = get_qc(qcStr)
-	qc.compiler.client.timeout = 600
+	worked = np.zeros(shape=(QUBIT_RANGE, ITERATIONS))
+	timing = np.zeros(shape=(QUBIT_RANGE, ITERATIONS))
 
-	#We instantiate a Bernstein Vazirani object, so we can later run it. 
-	bvObject = bv.BernsteinVazirani()
+	print('Testing out Bernstein-Vazirani alorithm...')
 
-	#We go ahead and start a timer so we can get results
-	start = time.perf_counter()
-	#We run the BV object and get our solution/answer. Note that the BV object ONLY sees the oracle and the quantum computer, nothing else. 
-	bvObject.run(qc, bitmap)
-	sol = (bvObject.get_solution())
+	seed(3245234)
+	for n in range(QUBIT_RANGE):
+		print(f'Trying {n+3}-qubit machine...')
+		for j in range(ITERATIONS):
+			print(f'Iteration {j+1}...')
 
-	end = time.perf_counter()
+			# randomly decide f
+			a = randrange(0,2**(n+1))
+			b = randint(0,1)
+			def f(x):
+				y = (a&x)
+				parity = 0
+				while y:
+					parity = ~parity
+					y = y & (y-1)
+				return parity^b
 
-	answer = ""
-	for i in range(int(N)):
-		answer+=sol[i]
+			start = time.perf_counter()
+			result, _ = bvObject.run(f, n+2)
+			end = time.perf_counter()
 
-	trueAnswer = bin(int(a, 2) + int(b,2))
-	trueAnswer = str(trueAnswer)[2:]
-	if(trueAnswer != answer):
-		print("We had an error! BV Didn't Work")
-	else:
-		print("BV worked successfully.")
-	#print our results
-	diff = end-start
-	print(str(diff) + " many seconds")
+			timing[n][j] = (end - start)
+
+	qubit_values = []
+	for i in range(QUBIT_RANGE):
+		qubit_values += [i+3]
+
+	average_runtimes = []
+	for i in range(QUBIT_RANGE):
+		average_runtimes += [np.mean(timing[i])]
+
+	plt.plot(qubit_values, average_runtimes)
+	plt.ylabel('Runtime (s)')
+	plt.xlabel('Number of Qubits')
+	plt.xticks(qubit_values)
+	plt.title('Quantum Simulation Scaling for Bernstein-Vazirani Algorithm')
+	plt.show()
 
 if __name__ == "__main__":
-	if(len(sys.argv) == 0):
-		print("Intended args: `python bvtest.py N`, where N is the number of qubits desired for the system.")
-	if(str(sys.argv[1]) == "-h"):
-	    print("Intended args: `python bvtest.py N`, where N is the number of qubits desired for the system.")
-	main(str(sys.argv[1]))
+	main()
