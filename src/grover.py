@@ -58,7 +58,7 @@ class Grover(object):
 	def run(self, f, n):
 		# execute circuit on smallest possible qc available
 		qc = get_qc(f'{n}q-qvm')
-		qc.compiler.client.timeout = 60
+		qc.compiler.client.timeout = 300
 		return self.execute(self.get_circuit(f, n), qc)
 
 

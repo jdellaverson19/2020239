@@ -50,7 +50,7 @@ class DeutschJozsa(object):
 	def run(self, f, n):
 		# execute circuit on smallest possible qc available
 		qc = get_qc(f'{n+1}q-qvm')
-		qc.compiler.client.timeout = 60
+		qc.compiler.client.timeout = 600
 		return self.execute(self.get_circuit(f, n), qc)
 
 
@@ -100,6 +100,7 @@ class DeutschJozsa(object):
 		"""
 		Run circuit p on n_qubti
 		"""
+		print(to_latex(p))
 
 		# run and measure circuit using 1 trial
 		results = qc.run_and_measure(p, 1)
