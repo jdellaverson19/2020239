@@ -10,9 +10,8 @@ The following applies to each of the Deutsch-Jozsa, Bernstein-Vazirani, Simon's,
   - Grover's: the integer value `x` such that `f(x) = 1`, where `f` is the input function.
 
 
-Additional notes on Bernstein-Vazirani and Simon's: 
-Both Bernstein-Vazirani and Simon's, in order to ensure that the function remains a black-box, don't accept the function itself. Instead, they accept a python dictionary from all possible inputs to their respective outputs. 
-Additionally, if one desires to use either test file (bvtest.py and simontest.py respectively), instructions are as follows:
-1: bvtest.py: pass in, as a command line argument, the number of desired qubits. The result (and success/failure) will also be outputted to the command line.
+Additional notes on Simon's: 
+Simon's Algorithm, in order to ensure that the function remains a black-box, doesn't accept the function itself. Instead, it accepts a python dictionary that maps all possible inputs to their respective outputs. 
+Additionally, here are instructions to run the test file simontest.py:
 
-2: simontest.py: This file does not accept command-line arguments. Instead, to change the size of the mask (and thus the number of qubits) change the value of `N` at the head of the main function.
+- This file does not accept command-line arguments. Instead, to change the size of the mask (and thus the number of qubits) change the value of `N` at the head of the main function.
