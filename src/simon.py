@@ -25,7 +25,7 @@ class Simon(object):
 
 	def makeU_f(self, bitmap):
 		#Speaking frankly, I have no idea how to do this -- this was 
-		#Stolen from the rigetti code on their grove github (https://github.com/rigetti/grove/blob/master/grove/bernstein_vazirani/bernstein_vazirani.py)
+		#Stolen from the rigetti code on their grove github (https://github.com/rigetti/grove/blob/master/grove/simona/Simon.py)
 		n_bits = len(list(bitmap.keys())[0])
 		n_ancillas = 1
 		ufunc = np.zeros(shape=(2 ** (n_bits + 1), 2 ** (n_bits + 1)))
@@ -37,8 +37,6 @@ class Simon(object):
 				# add mapping from initial state to the state in the ancilla system.
 				# pad_str corresponds to the initial state of the ancilla system.
 				index_mapping_dct[pad_str + k] = utils.xor(pad_str, v) + k
-				# calculate matrix indices that correspond to the transition-matrix-element
-				# of the oracle unitary
 				i, j = int(pad_str+k, 2), int(utils.xor(pad_str, v) + k, 2)
 				ufunc[i, j] = 1
 		return ufunc

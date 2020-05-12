@@ -42,7 +42,9 @@ def main(N):
 	for i in range(int(N)):
 		answer+=sol[i]
 
-	if(a != answer):
+	trueAnswer = bin(int(a, 2) + int(b,2))
+	trueAnswer = str(trueAnswer)[2:]
+	if(trueAnswer != answer):
 		print("We had an error! BV Didn't Work")
 	else:
 		print("BV worked successfully.")

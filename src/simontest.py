@@ -10,7 +10,6 @@ import math
 
 def main():
 	
-	simObject = simon.Simon()
 
 	# constants
     N = 2
@@ -25,14 +24,20 @@ def main():
 	seed(943856)
 	for n in range(0,N):
 		print(f'Trying 2{N}-qubit machine...')
-		for j in range(N):
+		for j in range(times):
 			print(f'Iteration {j+1}...')
 
 			# randomly decide f
             s = ""
             for i in range(0, N):
-                s+=str(math.floor(randint(0,1)*2))
+                s+=str(randint(0,1))
 			bitmap = simon.create_simons_bitmap(s)
+            
+            strLen = N*2
+            qcStr = str(strLen) + "q-qvm"
+            qc = get_qc(qcStr)
+            qc.compiler.client.timeout = 600
+            simonObject = simon.Simon()
 
 			start = time.perf_counter()
 			result = simObject.run(bitmap)
@@ -53,7 +58,7 @@ def main():
 	plt.ylabel('Runtime (s)')
 	plt.xlabel('Number of Qubits')
 	plt.xticks(qubit_values)
-	plt.title('Quantum Simulation Scaling for Deutsch-Jozsa Algorithm')
+	plt.title('Quantum Simulation Scaling for Simons Algorithm')
 	plt.show()
     print("The string: " + s)
     print("The calculated mask: " + simObject.getMask())
