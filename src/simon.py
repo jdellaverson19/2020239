@@ -46,6 +46,7 @@ def create_valid_2to1_bitmap(mask: str, random_seed: int = None) -> Dict[str, st
 #Take in mask s and a seed. Generate random 2-1 function as a bitmap. 
 def create_simons_bitmap(s, random_seed = None):
 	return create_valid_2to1_bitmap(s, random_seed)
+	#Did not manage to figure out, grabbed Rigetti implementation for function encoding
 
 
 

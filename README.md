@@ -11,7 +11,7 @@ The following applies to each of the Deutsch-Jozsa, Bernstein-Vazirani, Simon's,
 
 
 Additional notes on Simon's: 
-Simon's Algorithm, in order to ensure that the function remains a black-box, doesn't accept the function itself. Instead, it accepts a python dictionary that maps all possible inputs to their respective outputs. 
+Simon's Algorithm, in order to ensure that the function remains a black-box, doesn't accept the function itself. Instead, it accepts a python dictionary that maps all possible inputs (as bitstrings [e.g. `0001`]) to their respective outputs (in the same format). 
 Additionally, here are instructions to run the test file simontest.py:
 
 - This file does not accept command-line arguments. Instead, to change the size of the mask (and thus the number of qubits) change the value of `N` at the head of the main function.
