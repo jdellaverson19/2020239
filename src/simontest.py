@@ -55,6 +55,9 @@ def main():
 	plt.xticks(qubit_values)
 	plt.title('Quantum Simulation Scaling for Deutsch-Jozsa Algorithm')
 	plt.show()
-
+    print("The string: " + s)
+    print("The calculated mask: " + simObject.getMask())
+    if(s!=simObject.getMask()):
+        print("FAILURE")
 if __name__ == "__main__":
 	main()

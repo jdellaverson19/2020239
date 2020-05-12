@@ -32,3 +32,9 @@ def xor(st1, st2):
         strRes+=ele
     return strRes
 
+
+
+def mSB(x):
+    return np.argwhere(np.asarray(x) == 1)[0][0]
+
+    

@@ -69,17 +69,17 @@ class BernsteinVazirani(object):
 
 		for i in range(self.n_compQubs):
 			bvCircuit+=H(i)
-		print(bvCircuit)
 		return bvCircuit
 
 
 
 
 	def run(self, qc, bitmap):
-		result = qc.run_and_measure(self.makeTheCircuit(bitmap), 2)
-		print("Behold, s: ")
+		result = qc.run_and_measure(self.makeTheCircuit(bitmap), 1)
+		solStr = ""
 		for i in result:
-			print(result[i])
+			solStr+=str(result[i][0])
+		self.solution = solStr
 	def get_solution(self):
 		return self.solution
 

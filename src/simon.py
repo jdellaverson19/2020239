@@ -21,6 +21,7 @@ class Simon(object):
 	def __init__(self):
 		self.n_compQubs = 1
         self.mask = "001"
+        self.linIndepVectDict = {}
 
 	def makeU_f(self, bitmap):
 		#Speaking frankly, I have no idea how to do this -- this was 
@@ -67,16 +68,50 @@ class Simon(object):
         for i in range(self.n_compQubs):
             simCircuit+=H(i)
 
-    return simCircuit
+        return simCircuit
 
 	def run(self, qc, bitmap):
-		self.findIndependentVectors(bitmap)
-        
+		self.findIndependentVectors(bitmap, qc)
+        self.findMaskFromEq(bitmap)
+
+    def findIndependentVectors(self, bitmap, qc):
+        while(len(linIndepVectDict) < self.n_compQubs -1):
+            simCircuit = Program()
+            simCircuitReadout = prog.declare('ro', 'BIT', n_compQubs)
+            simCircuit += makeTheCircuit(bitmap)
+            for i in range(n_compQubs):
+                prog+=MEASURE(i, i)
+            compiledCirq = qc.compile(simCircuit)
+            sampled_bit_string = np.array(qc.run(compiledCirq)[0], dtype=int)
+            self.checkIfSafeAddition(sampled_bit_string)
+    
+    def checkIfSafeAddition(self, x):
+        #Check if all 0's
+        if (x = 0).all():
+            return None
+        xMsb = utils.mSB(x)
 
 
-	def get_mask(self):
+    def findMaskFromEq(self, ):
+
+
+
+	def getMask(self):
 		return self.mask
 
 
+    #Do backsubstitution
+    def backSub(self, firstMat, secondMat) -> np.ndarray:
+
+        # iterate backwards, starting from second to last row for back-substitution
+        m = np.copy(secondMat)
+        n = len(secondMat)
+        for row_num in range(n - 2, -1, -1):
+            row = firstMat[row_num]
+            for col_num in range(row_num + 1, n):
+                if row[col_num] == 1:
+                    m[row_num] = xor(secondMat[row_num], secondMat[col_num])
+
+    return m[::-1]
 
 
