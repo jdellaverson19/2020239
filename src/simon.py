@@ -45,6 +45,7 @@ def create_valid_2to1_bitmap2(mask):
 		f[j] = int(ran)
 		#Set up the two-one ness of it
 		#xor of j and s: utils.xor(intToBinString(j,N),s)
+		#Convert to binary string so we can use our xor function
 		f[int(binaryToInteger(utils.xor(intToBinString(j,N),mask)))] = int(ran)
 		range.remove(ran)
 	#Okay, so now we've made a mapping
