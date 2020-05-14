@@ -143,7 +143,6 @@ class Simon(object):
 			compiledCirq = qc.compile(simCircuit)
 			#get our output
 			simonbitstring = np.array(qc.run(compiledCirq)[0], dtype=int)
-			print(simonbitstring)
 			#See if it's an appropriate addition to our set of linearly indep equations. 
 			self.checkIfSafeAddition(simonbitstring)
 
@@ -159,7 +158,7 @@ class Simon(object):
 
 
 	def findMaskFromEq(self, bitmap):
-
+		#Inspiration/help from rigetti grove code. 
 		#We got n-1 linearly independent equations, so now we need to add a last one to get n
 		lasteq = self.lasteq()
 		#Turn it into a numpy array for convenience
@@ -167,9 +166,9 @@ class Simon(object):
 			[tup[1] for tup in sorted(zip(self.linIndepVectDict.keys(),
 										  self.linIndepVectDict.values()),
 									  key=lambda x: x[0])])
-		msb_unit_vec = np.zeros(shape=(self.n_compQubs,), dtype=int)
-		msb_unit_vec[lasteq] = 1
-		self.mask = self.backSub(eqMatrix, msb_unit_vec).tolist()
+		msbUnitVec = np.zeros(shape=(self.n_compQubs,), dtype=int)
+		msbUnitVec[lasteq] = 1
+		self.mask = self.backSub(eqMatrix, msbUnitVec)
 
 
 	def lasteq(self):
