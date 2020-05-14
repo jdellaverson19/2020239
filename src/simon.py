@@ -8,44 +8,65 @@ import utils
 from collections import defaultdict
 from typing import Dict, Tuple
 import numpy.random as rd
+from random import randint
+
 from pyquil.quil import DefGate
 from operator import xor
 
 
 
-def create_1to1_bitmap(mask: str) -> Dict[str, str]:
 
-	n_bits = len(mask)
-	form_string = "{0:0" + str(n_bits) + "b}"
-	bit_map_dct = {}
-	for idx in range(2**n_bits):
-		bit_string = form_string.format(idx)
-		bit_map_dct[bit_string] = utils.xor(bit_string, mask)
-	return bit_map_dct
+def binaryToInteger(binString):
+	count = int(binString,2)
+	return count
+
+def intToBinString(theInt, N):
+	listStr = ["{0:0","replace","b","}"]
+	listStr[1] = str(N)
+	out = "".join(listStr)
+	output = out.format(theInt)
+	return output
+	#outStr = []
+	#initialize to string of 0s
+	#for i in range(N):
+	#	outStr.append("0")
+	#Could have been done in above, but this is conceptually simpler
+	#for j in range(N):
+	#	if theInt//2 > 1:
+	#		theInt = theInt//2
+	#		outStr[N-1-j] = "1"
+	#output = "".join(outStr)
+	#print("int2binstring,",output, theInt)
+	#return output
 
 
-def create_valid_2to1_bitmap(mask: str, random_seed: int = None) -> Dict[str, str]:
-
-	if random_seed is not None:
-		rd.seed(random_seed)
-	bit_map = create_1to1_bitmap(mask)
-	n_samples = int(len(bit_map.keys()) / 2)
-	range_of_2to1_map = list(rd.choice(list(sorted(bit_map.keys())), replace=False, size=n_samples))
-
-	list_of_bitstring_tuples = sorted([(k, v) for k, v in bit_map.items()], key=lambda x: x[0])
-
-	bit_map_dct = {}
-	for cnt in range(n_samples):
-		bitstring_tup = list_of_bitstring_tuples[cnt]
-		val = range_of_2to1_map[cnt]
-		bit_map_dct[bitstring_tup[0]] = val
-		bit_map_dct[bitstring_tup[1]] = val
-	return bit_map_dct
-
+def create_valid_2to1_bitmap2(mask):
+	N = len(mask)
+	domain = np.zeros(2**N)
+	range = []
+	#populate as 1-1 identity
+	for x in np.arange(2**N):
+		domain[x] = int(x)
+		range.append(x)
+	f = np.zeros(2**N)
+	for j in np.arange(2**N):
+		#Pick a random element in our range
+		ran = range[randint(0,(len(range))-1)]
+		f[j] = int(ran)
+		#Set up the two-one ness of it
+		#xor of j and s: utils.xor(intToBinString(j,N),s)
+		f[int(binaryToInteger(utils.xor(intToBinString(j,N),mask)))] = int(ran)
+		range.remove(ran)
+	#Okay, so now we've made a mapping
+	#Let's turn it into a map as we'd really like
+	map = {}
+	for k in np.arange(len(f)):
+		map[intToBinString(int(k),N)] = intToBinString(int(f[k]),N)
+	return map
 
 #Take in mask s and a seed. Generate random 2-1 function as a bitmap. 
 def create_simons_bitmap(s, random_seed = None):
-	return create_valid_2to1_bitmap(s, random_seed)
+	return create_valid_2to1_bitmap2(s)
 	#Did not manage to figure out, grabbed Rigetti implementation for function encoding
 
 
@@ -62,23 +83,17 @@ class Simon(object):
 		self.linIndepVectDict = {}
 
 	def makeU_f(self, bitmap):
-		#Speaking frankly, I have no idea how to do this -- this was 
-		#Stolen from the rigetti code on their grove github (https://github.com/rigetti/grove/blob/master/grove/simona/Simon.py)
+		#This was inspired by the rigetti code on their grove github (https://github.com/rigetti/grove/blob/master/grove/simona/Simon.py)
 		n_bits = len(list(bitmap.keys())[0])
-		ufunc = np.zeros(shape=(2 ** (2 * n_bits), 2 ** (2 * n_bits)))
-		index_mapping_dct = defaultdict(dict)
+		U_f = np.zeros(shape=(2 ** (2 * n_bits), 2 ** (2 * n_bits)))
+		indexmap = defaultdict(dict)
 		for b in range(2**n_bits):
-			# padding according to ancilla state
 			pad_str = np.binary_repr(b, n_bits)
 			for k, v in bitmap.items():
-				# add mapping from initial state to the state in the ancilla system.
-				# pad_str corresponds to the initial state of the ancilla system.
-				index_mapping_dct[pad_str + k] = utils.xor(pad_str, v) + k
-				# calculate matrix indices that correspond to the transition-matrix-element
-				# of the oracle unitary
+				indexmap[pad_str + k] = utils.xor(pad_str, v) + k
 				i, j = int(pad_str+k, 2), int(utils.xor(pad_str, v) + k, 2)
-				ufunc[i, j] = 1
-		return ufunc, index_mapping_dct
+				U_f[i, j] = 1
+		return U_f, indexmap
 
 
 
@@ -114,13 +129,14 @@ class Simon(object):
 			for i in range(self.n_compQubs):
 				simCircuit+=MEASURE(i, simCircuitReadout[i])
 			compiledCirq = qc.compile(simCircuit)
-			sampled_bit_string = np.array(qc.run(compiledCirq)[0], dtype=int)
-			self.checkIfSafeAddition(sampled_bit_string)
+			simonbitstring = np.array(qc.run(compiledCirq)[0], dtype=int)
+			self.checkIfSafeAddition(simonbitstring)
 	
 	def checkIfSafeAddition(self, x):
 		#Check if all 0's
 		if (x == 0).all():
 			return None
+	#otherwise find the most significant 
 		xMsb = utils.mSB(x)
 		if (xMsb not in self.linIndepVectDict.keys()):
 			self.linIndepVectDict[xMsb] = x

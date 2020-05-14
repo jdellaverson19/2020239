@@ -13,7 +13,7 @@ def main():
 	
 
 	# constants
-	N = 1
+	N = 2
 	times = 1
 
 
@@ -22,7 +22,7 @@ def main():
 
 	print('Testing out Simons alorithm...')
 
-	for n in range(0,1):
+	for n in range(0,2):
 		print(f'Trying 2*{N}-qubit machine...')
 		for j in range(times):
 			print(f'Iteration {j+1}...')
